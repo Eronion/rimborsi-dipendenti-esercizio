@@ -38,3 +38,15 @@ def esente_riconosciuta_nel_mese(richieste, dipendente, mese_riferimento):
         and mese(r) == mese_riferimento
     )
     return round(totale, 2)
+
+
+def giorni_telelavoro_nel_mese(richieste, dipendente, mese_riferimento):
+    """Giorni di telelavoro già riconosciuti al dipendente nel mese."""
+    return sum(
+        r["giorni"]
+        for r in richieste
+        if r["dipendente"] == dipendente
+        and r["stato"] == "valida"
+        and r["categoria"] == "telelavoro"
+        and mese(r) == mese_riferimento
+    )

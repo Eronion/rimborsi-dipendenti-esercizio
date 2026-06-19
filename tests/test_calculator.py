@@ -37,6 +37,58 @@ class TestMassimaleTeorico:
         assert calculator.massimale_teorico(r) == 300.0
 
 
+class TestTrasfertaEstero2026:
+    def test_5_giorni_cap_pieno(self):
+        r = richiesta(categoria="trasferta_estero", giorni=5, data="2026-03-10")
+        assert calculator.massimale_teorico(r) == 425.00
+
+    def test_6_giorni_riduzione_10pct(self):
+        r = richiesta(categoria="trasferta_estero", giorni=6, data="2026-03-10")
+        assert calculator.massimale_teorico(r) == 501.50
+
+    def test_10_giorni_no_terzo_scaglione(self):
+        r = richiesta(categoria="trasferta_estero", giorni=10, data="2026-03-10")
+        assert calculator.massimale_teorico(r) == 807.50
+
+    def test_12_giorni_doppia_riduzione(self):
+        r = richiesta(categoria="trasferta_estero", giorni=12, data="2026-03-10")
+        assert calculator.massimale_teorico(r) == 943.50
+
+    def test_5_giorni_2025_nessuna_riduzione(self):
+        r = richiesta(categoria="trasferta_estero", giorni=5, data="2025-10-06")
+        assert calculator.massimale_teorico(r) == 387.35
+
+
+class TestTelelavoro:
+    def test_sotto_limite_mensile(self):
+        r = richiesta(categoria="telelavoro", giorni=5, importo=17.50, data="2026-03-10")
+        assert calculator.massimale_teorico(r, giorni_telelavoro_gia_usati=0) == 17.50
+
+    def test_giorni_limitati_da_residuo(self):
+        r = richiesta(categoria="telelavoro", giorni=8, importo=28.00, data="2026-03-10")
+        # residuo: 12 - 7 = 5 giorni consentiti → 5 × 3.50 = 17.50
+        assert calculator.massimale_teorico(r, giorni_telelavoro_gia_usati=7) == 17.50
+
+    def test_residuo_zero_tutto_imponibile(self):
+        r = richiesta(categoria="telelavoro", giorni=3, importo=10.50, data="2026-03-10")
+        esente, imponibile, _ = calculator.calcola(r, 0.0, giorni_telelavoro_gia_usati=12)
+        assert esente == 0.0
+        assert imponibile == 10.50
+
+    def test_oltre_12_giorni(self):
+        r = richiesta(categoria="telelavoro", giorni=15, importo=52.50, data="2026-03-10")
+        # min(15, 12) = 12 giorni → 12 × 3.50 = 42.00
+        assert calculator.massimale_teorico(r, giorni_telelavoro_gia_usati=0) == 42.00
+
+    def test_esempio_circolare_sezione3(self):
+        # Esempio §3: 8 già usati, richiesta 6 gg, importo 21.00
+        # allowed = min(6, 12-8) = 4 → cap = 14.00 → esente = 14.00, imponibile = 7.00
+        r = richiesta(categoria="telelavoro", giorni=6, importo=21.00, data="2026-03-10")
+        esente, imponibile, _ = calculator.calcola(r, 0.0, giorni_telelavoro_gia_usati=8)
+        assert esente == 14.00
+        assert imponibile == 7.00
+
+
 class TestMassimali2026:
     def test_trasferta_italia_2026(self):
         r = richiesta(categoria="trasferta_italia", giorni=4, data="2026-03-10")

@@ -3,12 +3,13 @@
 {% block contenuto %}
 <h1>Normativa vigente</h1>
 
-{% macro tabella_massimali(regole) %}
+{% macro tabella_massimali(regole, anno) %}
 <table class="tabella">
   <thead>
     <tr>
       <th>Categoria</th>
       <th class="num">Massimale di esenzione</th>
+      <th>Note</th>
     </tr>
   </thead>
   <tbody>
@@ -16,19 +17,30 @@
     <tr>
       <td>{{ categorie[codice] }}</td>
       <td class="num">{{ "%.2f"|format(massimale) }} € / giorno</td>
+      <td>{% if codice == "trasferta_estero" and anno == 2026 %}Riduzione 10% dal 6° giorno, 20% dall'11°{% endif %}</td>
     </tr>
     {% endfor %}
+    {% if anno == 2026 %}
+    <tr>
+      <td>{{ categorie["telelavoro"] }}</td>
+      <td class="num">3.50 € / giorno</td>
+      <td>Max 12 giorni / mese; incompatibile con trasferta stessa giornata</td>
+    </tr>
+    {% endif %}
     <tr>
       <td>{{ categorie["chilometrico"] }}</td>
       <td class="num">{{ "%.2f"|format(regole.massimale_km) }} € / km</td>
+      <td></td>
     </tr>
     <tr>
       <td>{{ categorie["alloggio"] }}</td>
       <td class="num">{{ "%.2f"|format(regole.massimale_notte) }} € / notte</td>
+      <td></td>
     </tr>
     <tr class="riga-evidenziata">
       <td><strong>Plafond mensile complessivo per dipendente</strong></td>
       <td class="num"><strong>{{ "%.2f"|format(regole.plafond_mensile) }} € / mese</strong></td>
+      <td></td>
     </tr>
   </tbody>
 </table>
@@ -37,13 +49,13 @@
 <section class="scheda">
   <h2>Dal 01/01/2026 – {{ regole_2026.riferimento }}</h2>
   <p class="nota">Applicabile alle spese con data di sostenimento dal 01/01/2026.</p>
-  {{ tabella_massimali(regole_2026) }}
+  {{ tabella_massimali(regole_2026, 2026) }}
 </section>
 
 <section class="scheda">
   <h2>Fino al 31/12/2025 – {{ regole_2025.riferimento }}</h2>
   <p class="nota">Applicabile alle spese con data di sostenimento fino al 31/12/2025.</p>
-  {{ tabella_massimali(regole_2025) }}
+  {{ tabella_massimali(regole_2025, 2025) }}
 </section>
 
 <section class="scheda">

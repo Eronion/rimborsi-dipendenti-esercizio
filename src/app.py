@@ -36,10 +36,22 @@ def _registra(form):
     }
     ok, motivazione = validator.valida(richiesta)
     if ok:
+        richieste_valide = [r for r in richieste if r.get("stato") == "valida"]
+        ok, motivazione = validator.valida_compatibilita(richiesta, richieste_valide)
+    if ok:
         gia_riconosciuta = storage.esente_riconosciuta_nel_mese(
             richieste, richiesta["dipendente"], storage.mese(richiesta)
         )
-        esente, imponibile, dettaglio = calculator.calcola(richiesta, gia_riconosciuta)
+        gg_telelavoro = (
+            storage.giorni_telelavoro_nel_mese(
+                richieste, richiesta["dipendente"], storage.mese(richiesta)
+            )
+            if richiesta["categoria"] == "telelavoro"
+            else 0
+        )
+        esente, imponibile, dettaglio = calculator.calcola(
+            richiesta, gia_riconosciuta, gg_telelavoro
+        )
         richiesta.update(
             stato="valida",
             motivazione="",

@@ -22,12 +22,16 @@ MASSIMALE_NOTTE_2026 = 170.00
 PLAFOND_MENSILE_2026 = 1400.00
 RIFERIMENTO_NORMATIVO_2026 = "Circolare MEF n. 18/2026"
 
+MASSIMALE_TELELAVORO_2026 = 3.50
+MAX_GIORNI_TELELAVORO_MESE = 12
+
 CATEGORIE = {
     "trasferta_italia": "Trasferta in Italia",
     "trasferta_estero": "Trasferta all'estero",
     "pasto": "Rimborso pasto",
     "chilometrico": "Rimborso chilometrico",
     "alloggio": "Rimborso alloggio",
+    "telelavoro": "Telelavoro giornaliero",
 }
 
 CATEGORIE_A_GIORNATE = ("trasferta_italia", "trasferta_estero", "pasto")

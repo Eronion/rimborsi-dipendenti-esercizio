@@ -101,3 +101,33 @@ def test_alloggio_valido():
     assert validator.valida(
         richiesta(categoria="alloggio", notti=3, giorni=None)
     ) == (True, "")
+
+
+def test_telelavoro_valido():
+    assert validator.valida(
+        richiesta(categoria="telelavoro", giorni=3, data="2026-03-10")
+    ) == (True, "")
+
+
+def test_telelavoro_pre_2026_respinto():
+    ok, motivazione = validator.valida(
+        richiesta(categoria="telelavoro", giorni=3, data="2025-12-31")
+    )
+    assert not ok
+    assert motivazione == "categoria non riconosciuta"
+
+
+def test_telelavoro_giorni_mancanti():
+    ok, motivazione = validator.valida(
+        richiesta(categoria="telelavoro", giorni=None, data="2026-03-10")
+    )
+    assert not ok
+    assert motivazione == "numero di giornate non valido"
+
+
+def test_telelavoro_giorni_zero():
+    ok, motivazione = validator.valida(
+        richiesta(categoria="telelavoro", giorni=0, data="2026-03-10")
+    )
+    assert not ok
+    assert motivazione == "numero di giornate non valido"
