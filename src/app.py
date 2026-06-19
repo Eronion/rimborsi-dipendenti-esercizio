@@ -118,19 +118,43 @@ def riepilogo():
             "imponibile": dati["imponibile"],
             "richieste": dati["richieste"],
             "percentuale_plafond": min(
-                round(dati["esente"] / rules.PLAFOND_MENSILE * 100), 100
+                round(
+                    dati["esente"]
+                    / (rules.PLAFOND_MENSILE_2026 if mese >= "2026-01" else rules.PLAFOND_MENSILE_2025)
+                    * 100
+                ),
+                100,
             ),
         }
         for (mese, dipendente), dati in sorted(gruppi.items(), reverse=True)
     ]
     return render_template(
-        "riepilogo.html", righe=righe, plafond=rules.PLAFOND_MENSILE
+        "riepilogo.html", righe=righe, plafond=rules.PLAFOND_MENSILE_2026
     )
 
 
 @app.get("/normativa")
 def normativa():
-    return render_template("normativa.html", rules=rules)
+    regole_2025 = {
+        "riferimento": rules.RIFERIMENTO_NORMATIVO_2025,
+        "massimali_giornalieri": rules.MASSIMALI_GIORNALIERI_2025,
+        "massimale_km": rules.MASSIMALE_KM_2025,
+        "massimale_notte": rules.MASSIMALE_NOTTE_2025,
+        "plafond_mensile": rules.PLAFOND_MENSILE_2025,
+    }
+    regole_2026 = {
+        "riferimento": rules.RIFERIMENTO_NORMATIVO_2026,
+        "massimali_giornalieri": rules.MASSIMALI_GIORNALIERI_2026,
+        "massimale_km": rules.MASSIMALE_KM_2026,
+        "massimale_notte": rules.MASSIMALE_NOTTE_2026,
+        "plafond_mensile": rules.PLAFOND_MENSILE_2026,
+    }
+    return render_template(
+        "normativa.html",
+        regole_2025=regole_2025,
+        regole_2026=regole_2026,
+        categorie=rules.CATEGORIE,
+    )
 
 
 if __name__ == "__main__":

@@ -37,6 +37,57 @@ class TestMassimaleTeorico:
         assert calculator.massimale_teorico(r) == 300.0
 
 
+class TestMassimali2026:
+    def test_trasferta_italia_2026(self):
+        r = richiesta(categoria="trasferta_italia", giorni=4, data="2026-03-10")
+        assert calculator.massimale_teorico(r) == 200.00
+
+    def test_trasferta_estero_2026(self):
+        r = richiesta(categoria="trasferta_estero", giorni=3, data="2026-03-10")
+        assert calculator.massimale_teorico(r) == 255.00
+
+    def test_pasto_2026(self):
+        r = richiesta(categoria="pasto", giorni=5, data="2026-03-10")
+        assert calculator.massimale_teorico(r) == 50.00
+
+    def test_chilometrico_2026(self):
+        r = richiesta(categoria="chilometrico", km=250, data="2026-03-10")
+        assert calculator.massimale_teorico(r) == 112.50
+
+    def test_alloggio_2026(self):
+        r = richiesta(categoria="alloggio", notti=2, data="2026-03-10")
+        assert calculator.massimale_teorico(r) == 340.00
+
+    def test_plafond_2026_capienza_residua(self):
+        r = richiesta(categoria="alloggio", notti=2, importo=200.0, data="2026-03-10")
+        esente, imponibile, dettaglio = calculator.calcola(r, esente_gia_riconosciuta=1300.0)
+        assert esente == 100.0
+        assert imponibile == 100.0
+        assert dettaglio["capienza_plafond"] == 100.0
+
+    def test_plafond_2026_esaurito(self):
+        r = richiesta(categoria="pasto", giorni=1, importo=10.0, data="2026-03-10")
+        esente, imponibile, _ = calculator.calcola(r, esente_gia_riconosciuta=1400.0)
+        assert esente == 0.0
+        assert imponibile == 10.0
+
+    def test_transitional_2025_date_usa_cap_vecchi(self):
+        r = richiesta(categoria="pasto", giorni=5, importo=50.0, data="2025-12-31")
+        assert calculator.massimale_teorico(r) == 40.0  # 5 × 8.00, non 5 × 10.00
+
+    def test_transitional_2025_date_usa_plafond_vecchio(self):
+        r = richiesta(categoria="pasto", giorni=1, importo=8.0, data="2025-12-31")
+        esente, imponibile, _ = calculator.calcola(r, esente_gia_riconosciuta=1200.0)
+        assert esente == 0.0  # plafond 1200 esaurito
+        assert imponibile == 8.0
+
+    def test_transitional_2026_date_usa_plafond_nuovo(self):
+        r = richiesta(categoria="pasto", giorni=1, importo=10.0, data="2026-01-01")
+        esente, imponibile, _ = calculator.calcola(r, esente_gia_riconosciuta=1200.0)
+        assert esente == 10.0  # capienza residua 1400 - 1200 = 200
+        assert imponibile == 0.0
+
+
 class TestCalcola:
     def test_importo_sotto_massimale_tutto_esente(self):
         r = richiesta(categoria="pasto", giorni=5, importo=35.0)

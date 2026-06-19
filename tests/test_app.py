@@ -96,3 +96,11 @@ def test_normativa_mostra_massimali_vigenti(client):
     assert "46.48" in testo
     assert "77.47" in testo
     assert "1200.00" in testo
+
+
+def test_normativa_mostra_massimali_2026(client):
+    testo = client.get("/normativa").get_data(as_text=True)
+    assert "50.00" in testo
+    assert "85.00" in testo
+    assert "1400.00" in testo
+    assert "18/2026" in testo

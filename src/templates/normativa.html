@@ -2,8 +2,8 @@
 {% block titolo %}Normativa vigente{% endblock %}
 {% block contenuto %}
 <h1>Normativa vigente</h1>
-<p class="nota">Parametri applicati dal sistema. Fonte: {{ rules.RIFERIMENTO_NORMATIVO }}.</p>
 
+{% macro tabella_massimali(regole) %}
 <table class="tabella">
   <thead>
     <tr>
@@ -12,26 +12,39 @@
     </tr>
   </thead>
   <tbody>
-    {% for codice, massimale in rules.MASSIMALI_GIORNALIERI.items() %}
+    {% for codice, massimale in regole.massimali_giornalieri.items() %}
     <tr>
-      <td>{{ rules.CATEGORIE[codice] }}</td>
+      <td>{{ categorie[codice] }}</td>
       <td class="num">{{ "%.2f"|format(massimale) }} € / giorno</td>
     </tr>
     {% endfor %}
     <tr>
-      <td>{{ rules.CATEGORIE["chilometrico"] }}</td>
-      <td class="num">{{ "%.2f"|format(rules.MASSIMALE_KM) }} € / km</td>
+      <td>{{ categorie["chilometrico"] }}</td>
+      <td class="num">{{ "%.2f"|format(regole.massimale_km) }} € / km</td>
     </tr>
     <tr>
-      <td>{{ rules.CATEGORIE["alloggio"] }}</td>
-      <td class="num">{{ "%.2f"|format(rules.MASSIMALE_NOTTE) }} € / notte</td>
+      <td>{{ categorie["alloggio"] }}</td>
+      <td class="num">{{ "%.2f"|format(regole.massimale_notte) }} € / notte</td>
     </tr>
     <tr class="riga-evidenziata">
       <td><strong>Plafond mensile complessivo per dipendente</strong></td>
-      <td class="num"><strong>{{ "%.2f"|format(rules.PLAFOND_MENSILE) }} € / mese</strong></td>
+      <td class="num"><strong>{{ "%.2f"|format(regole.plafond_mensile) }} € / mese</strong></td>
     </tr>
   </tbody>
 </table>
+{% endmacro %}
+
+<section class="scheda">
+  <h2>Dal 01/01/2026 – {{ regole_2026.riferimento }}</h2>
+  <p class="nota">Applicabile alle spese con data di sostenimento dal 01/01/2026.</p>
+  {{ tabella_massimali(regole_2026) }}
+</section>
+
+<section class="scheda">
+  <h2>Fino al 31/12/2025 – {{ regole_2025.riferimento }}</h2>
+  <p class="nota">Applicabile alle spese con data di sostenimento fino al 31/12/2025.</p>
+  {{ tabella_massimali(regole_2025) }}
+</section>
 
 <section class="scheda">
   <h2>Come avviene il calcolo</h2>
@@ -41,5 +54,6 @@
     <li>La quota esente effettiva è limitata dalla capienza residua del plafond mensile del dipendente.</li>
     <li>La parte eccedente è quota imponibile e concorre alla formazione del reddito.</li>
   </ol>
+  <p class="nota">I massimali applicati dipendono dall'anno della data di sostenimento della spesa (regime transitorio – art. 7 Circ. MEF 18/2026).</p>
 </section>
 {% endblock %}
