@@ -1,0 +1,30 @@
+name: "Sezione 6 – Casi particolari (Circ. MEF 18/2026)"
+
+on:
+  push:
+    paths:
+      - "tests/test_circolare_sezione6.py"
+      - "src/calculator.py"
+      - "src/rules.py"
+      - "src/validator.py"
+  pull_request:
+    paths:
+      - "tests/test_circolare_sezione6.py"
+      - "src/calculator.py"
+      - "src/rules.py"
+      - "src/validator.py"
+  workflow_dispatch:
+
+jobs:
+  test-sezione6:
+    name: "Test §6 Circolare MEF 18/2026"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Installa le dipendenze
+        run: pip install -r requirements.txt
+      - name: Esegui i test Sezione 6
+        run: pytest tests/test_circolare_sezione6.py -v
